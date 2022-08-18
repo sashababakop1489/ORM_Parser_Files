@@ -1,20 +1,26 @@
-package com.knubisoft.babakov.filestipesstrategy;
+package com.knubisoft.babakov.filestypesstrategy;
 
-import com.knubisoft.babakov.table.Table;
+import com.knubisoft.babakov.dto.FileReadWriteSource;
+import com.knubisoft.babakov.dto.Table;
+import com.knubisoft.babakov.entity.BaseEntity;
+import lombok.SneakyThrows;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CSVParsingStrategy implements ParsingStrategy {
+public class CSVParsingStrategy implements ParsingStrategy<FileReadWriteSource> {
 
     public static final String DELIMITER = ",";
     public static final String COMMENT = "--";
 
     @Override
-    public Table parseToTable(String content) {
-        List<String> lines = Arrays.asList(content.split(System.lineSeparator()));
+    public Table parseToTable(FileReadWriteSource content) {
+        List<String> lines = Arrays.asList(content.getContent().split(System.lineSeparator()));
         Map<Integer, String> mapping = buildMapping(lines.get(0));
         Map<Integer, Map<String, String>> result = buildTable(lines.subList(1, lines.size()), mapping);
         return new Table(result);
@@ -54,5 +60,15 @@ public class CSVParsingStrategy implements ParsingStrategy {
 
     private static String[] splitLine(String line) {
         return line.split(DELIMITER);
+    }
+
+    @SneakyThrows
+    public  void writeToFileOrDB(File file, List<? extends BaseEntity> list) {
+        FileWriter writer = new FileWriter(file.getName(), true);
+
+        for (Object sample : list) {
+            writer.write(sample.toString());
+        }
+        writer.close();
     }
 }

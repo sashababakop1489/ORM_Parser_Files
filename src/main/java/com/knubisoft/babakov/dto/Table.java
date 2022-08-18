@@ -1,4 +1,4 @@
-package com.knubisoft.babakov.table;
+package com.knubisoft.babakov.dto;
 
 import lombok.RequiredArgsConstructor;
 

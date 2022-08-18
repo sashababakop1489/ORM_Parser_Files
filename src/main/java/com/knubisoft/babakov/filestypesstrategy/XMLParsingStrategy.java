@@ -1,20 +1,25 @@
-package com.knubisoft.babakov.filestipesstrategy;
+package com.knubisoft.babakov.filestypesstrategy;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.knubisoft.babakov.table.Table;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.knubisoft.babakov.dto.FileReadWriteSource;
+import com.knubisoft.babakov.dto.Table;
+import com.knubisoft.babakov.entity.BaseEntity;
 import lombok.SneakyThrows;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
-public class JSONParsingStrategy implements ParsingStrategy {
+public class XMLParsingStrategy implements ParsingStrategy<FileReadWriteSource> {
     @SneakyThrows
     @Override
-    public Table parseToTable(String content) {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode tree = mapper.readTree(content);
+    public Table parseToTable(FileReadWriteSource content) {
+        // TODO
+        XmlMapper xmpMapper = new XmlMapper();
+        JsonNode tree = xmpMapper.readTree(content.getContent());
         Map<Integer, Map<String, String>> result = buildTable(tree);
         return new Table(result);
     }
@@ -23,9 +28,11 @@ public class JSONParsingStrategy implements ParsingStrategy {
         Map<Integer, Map<String, String>> map = new LinkedHashMap<>();
         int index = 0;
         for (JsonNode each : tree) {
-            Map<String, String> item = buildRow(each);
-            map.put(index, item);
-            index++;
+            for (JsonNode f : each) {
+                Map<String, String> item = buildRow(f);
+                map.put(index, item);
+                index++;
+            }
         }
         return map;
     }
@@ -38,5 +45,10 @@ public class JSONParsingStrategy implements ParsingStrategy {
             item.put(next.getKey(), next.getValue().textValue());
         }
         return item;
+    }
+
+    @Override
+    public void writeToFileOrDB(File file, List<? extends BaseEntity> list) {
+
     }
 }
