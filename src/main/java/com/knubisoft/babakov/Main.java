@@ -31,7 +31,7 @@ public class Main {
     }
         @SneakyThrows
         private static void process(Connection connection) {
-        URL url = Main.class.getClassLoader().getResource("sample.json");
+        URL url = Main.class.getClassLoader().getResource("sample.csv");
 
         List<Person> result;
          result = ORM.readAll(new FileReadWriteSource(new File(url.toURI())), Person.class);

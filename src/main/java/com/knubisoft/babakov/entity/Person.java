@@ -22,4 +22,15 @@ public class Person extends BaseEntity {
     private LocalDate dateOfBirth;
     private Float xxx;
 
+    @Override
+    public String toString() {
+        return "Person{" +
+                "name=" + name +
+                ", age=" + age +
+                ", salary=" + salary +
+                ", position=" + position +
+                ", dateOfBirth=" + dateOfBirth +
+                ", xxx=" + xxx +
+                '}';
+    }
 }

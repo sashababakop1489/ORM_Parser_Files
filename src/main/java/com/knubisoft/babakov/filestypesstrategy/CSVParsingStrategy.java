@@ -8,10 +8,8 @@ import lombok.SneakyThrows;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.util.*;
 
 public class CSVParsingStrategy implements ParsingStrategy<FileReadWriteSource> {
 
@@ -64,11 +62,15 @@ public class CSVParsingStrategy implements ParsingStrategy<FileReadWriteSource> 
 
     @SneakyThrows
     public  void writeToFileOrDB(File file, List<? extends BaseEntity> list) {
-        FileWriter writer = new FileWriter(file.getName(), true);
+        String str = list.get(list.size() - 1).toString().replace('}', ' ');
+        String[] strArr = str.split(",");
+        String ans = "";
+        for (String s : strArr)
+            ans = ans + s.split("=")[1] + ",";
+        ans = ans.substring(0, ans.lastIndexOf(",")).trim();
 
-        for (Object sample : list) {
-            writer.write(sample.toString());
-        }
+        FileWriter writer = new FileWriter("src/main/resources/" + file.getName(), true);
+        writer.write("\n" + ans);
         writer.close();
     }
 }

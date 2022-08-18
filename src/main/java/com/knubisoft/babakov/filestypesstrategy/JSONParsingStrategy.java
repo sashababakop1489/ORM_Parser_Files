@@ -52,17 +52,17 @@ public class JSONParsingStrategy implements ParsingStrategy<FileReadWriteSource>
     @Override
     public void writeToFileOrDB(File file, List<? extends BaseEntity> list) {
         ObjectMapper objectMapper = new ObjectMapper();
-        String oldStr = FileUtils.readFileToString(new File("src/main/resources/sample.json"), StandardCharsets.UTF_8);
+        String oldStr = FileUtils.readFileToString(new File("src/main/resources/" + file.getName()), StandardCharsets.UTF_8);
         oldStr = oldStr.substring(0, oldStr.lastIndexOf(']')) + ",";
         objectMapper.registerModule(new JSR310Module());
         String str = objectMapper.writeValueAsString(list);
         str = str.substring(1);
 
 
-        PrintWriter writer = new PrintWriter("src/main/resources/sample.json");
+        PrintWriter writer = new PrintWriter("src/main/resources/" + file.getName());
         writer.print("");
         writer.close();
-        try(PrintWriter out = new PrintWriter(new FileWriter("src/main/resources/sample.json", true)))
+        try(PrintWriter out = new PrintWriter(new FileWriter("src/main/resources/" + file.getName(), true)))
         {
             out.write(oldStr);
             out.write(str);
