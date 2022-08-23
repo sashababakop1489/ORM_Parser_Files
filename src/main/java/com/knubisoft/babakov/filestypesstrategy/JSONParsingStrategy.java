@@ -2,20 +2,14 @@ package com.knubisoft.babakov.filestypesstrategy;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.knubisoft.babakov.dto.FileReadWriteSource;
 import com.knubisoft.babakov.dto.Table;
 import com.knubisoft.babakov.entity.BaseEntity;
 import lombok.SneakyThrows;
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.FileWriter;
-
-
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class JSONParsingStrategy implements ParsingStrategy<FileReadWriteSource> {
@@ -49,23 +43,30 @@ public class JSONParsingStrategy implements ParsingStrategy<FileReadWriteSource>
         return item;
     }
     @SneakyThrows
-    @Override
-    public void writeToFileOrDB(File file, List<? extends BaseEntity> list) {
+    public void writeToFile(FileReadWriteSource file, List<? extends BaseEntity> list) {
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        String oldStr = FileUtils.readFileToString(new File("src/main/resources/" + file.getName()), StandardCharsets.UTF_8);
+//        oldStr = oldStr.substring(0, oldStr.lastIndexOf(']')) + ",";
+//        objectMapper.registerModule(new JSR310Module());
+//        String str = objectMapper.writeValueAsString(list);
+//       // str += "]";
+//
+//
+//        PrintWriter writer = new PrintWriter("src/main/resources/" + file.getName());
+//        writer.print("");
+//        writer.close();
+//        try(PrintWriter out = new PrintWriter(new FileWriter("src/main/resources/" + file.getName(), true)))
+//        {
+//           // out.write(oldStr);
+//            out.write(str);
+//        }
+
         ObjectMapper objectMapper = new ObjectMapper();
-        String oldStr = FileUtils.readFileToString(new File("src/main/resources/" + file.getName()), StandardCharsets.UTF_8);
-        oldStr = oldStr.substring(0, oldStr.lastIndexOf(']')) + ",";
-        objectMapper.registerModule(new JSR310Module());
-        String str = objectMapper.writeValueAsString(list);
-        str = str.substring(1);
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
+        String jsonString = objectMapper.writeValueAsString(list);
+        Files.write(Path.of("src/main/resources/" + file.getSource().getName()), jsonString.getBytes());
 
 
-        PrintWriter writer = new PrintWriter("src/main/resources/" + file.getName());
-        writer.print("");
-        writer.close();
-        try(PrintWriter out = new PrintWriter(new FileWriter("src/main/resources/" + file.getName(), true)))
-        {
-            out.write(oldStr);
-            out.write(str);
-        }
     }
 }

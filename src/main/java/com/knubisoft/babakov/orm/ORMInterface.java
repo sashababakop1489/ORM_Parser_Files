@@ -1,11 +1,7 @@
 package com.knubisoft.babakov.orm;
 
 import com.knubisoft.babakov.dto.DataReadWriteSource;
-import com.knubisoft.babakov.dto.Table;
 import com.knubisoft.babakov.entity.BaseEntity;
-import com.knubisoft.babakov.entity.Person;
-
-import java.sql.ResultSet;
 import java.util.List;
 
 public interface ORMInterface {

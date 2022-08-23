@@ -2,12 +2,18 @@ package com.knubisoft.babakov.filestypesstrategy;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.knubisoft.babakov.dto.FileReadWriteSource;
 import com.knubisoft.babakov.dto.Table;
 import com.knubisoft.babakov.entity.BaseEntity;
 import lombok.SneakyThrows;
 
+
+
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -46,9 +52,15 @@ public class XMLParsingStrategy implements ParsingStrategy<FileReadWriteSource> 
         }
         return item;
     }
-
+    @SneakyThrows
     @Override
-    public void writeToFileOrDB(File file, List<? extends BaseEntity> list) {
+    public void writeToFile(FileReadWriteSource file, List<? extends BaseEntity> list) {
 
+        XmlMapper xmlMapper = new XmlMapper();
+        xmlMapper.registerModule(new JavaTimeModule());
+        xmlMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
+        String xml = xmlMapper.writeValueAsString(list);
+        xml = xml.replaceAll("ArrayList", "root");
+        Files.write(Path.of("src/main/resources/" + file.getSource().getName()), xml.getBytes());
     }
 }

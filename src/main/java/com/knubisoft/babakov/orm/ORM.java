@@ -10,15 +10,12 @@ import com.knubisoft.babakov.dto.Table;
 import lombok.SneakyThrows;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
-import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 
 public class ORM implements ORMInterface {
-
-
 
     @Override
     public <T> List<T> readAll(DataReadWriteSource<?> inputSource, Class<T> cls) {
@@ -92,9 +89,9 @@ public class ORM implements ORMInterface {
     @Override
     public void writeAll(DataReadWriteSource<?> inputSource, List<? extends BaseEntity> list) {
         if (inputSource instanceof ConnectionReadWriteSource dataInputSource){
-          //  new DatabaseParsingStrategy().writeToFileOrDB(dataInputSource, list);
+            new DatabaseParsingStrategy().writeToDB(dataInputSource, list);
         } else if (inputSource instanceof FileReadWriteSource fileSource){
-            getStringParsingStrategy(fileSource).writeToFileOrDB(fileSource.getFile(), list);
+            getStringParsingStrategy(fileSource).writeToFile(fileSource, list);
         } else {
             throw new UnsupportedOperationException("Unknown DataInputSource " + inputSource);
         }

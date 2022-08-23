@@ -1,6 +1,6 @@
 package com.knubisoft.babakov.entity;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
+import com.knubisoft.babakov.annotation.TableAnnotation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,8 +12,7 @@ import java.math.BigInteger;
 @NoArgsConstructor
 @Getter
 @Setter
-//@Table
-//@Entity
+@TableAnnotation(value = "person")
 public class Person2 extends BaseEntity {
     private String name;
     private BigInteger age;

@@ -4,12 +4,13 @@ import com.knubisoft.babakov.dto.FileReadWriteSource;
 import com.knubisoft.babakov.dto.Table;
 import com.knubisoft.babakov.entity.BaseEntity;
 import lombok.SneakyThrows;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CSVParsingStrategy implements ParsingStrategy<FileReadWriteSource> {
 
@@ -61,16 +62,47 @@ public class CSVParsingStrategy implements ParsingStrategy<FileReadWriteSource> 
     }
 
     @SneakyThrows
-    public  void writeToFileOrDB(File file, List<? extends BaseEntity> list) {
-        String str = list.get(list.size() - 1).toString().replace('}', ' ');
-        String[] strArr = str.split(",");
-        String ans = "";
-        for (String s : strArr)
-            ans = ans + s.split("=")[1] + ",";
-        ans = ans.substring(0, ans.lastIndexOf(",")).trim();
+    public  void writeToFile(FileReadWriteSource file, List<? extends BaseEntity> list) {
+//        String str = list.get(list.size() - 1).toString().replace('}', ' ');
+//        String[] strArr = str.split(",");
+//        String ans = "";
+//        for (String s : strArr)
+//            ans = ans + s.split("=")[1] + ",";
+//        ans = ans.substring(0, ans.lastIndexOf(",")).trim();
+//
+//        FileWriter writer = new FileWriter("src/main/resources/" + file.getName(), true);
+//        writer.write("\n" + ans);
+//        writer.close();
 
-        FileWriter writer = new FileWriter("src/main/resources/" + file.getName(), true);
-        writer.write("\n" + ans);
-        writer.close();
+        String content = String.join(System.lineSeparator(), convertToListOfHeaderAndData(list));
+        FileUtils.writeStringToFile(new File("src/main/resources/" + file.getSource().getName()),content, StandardCharsets.UTF_8);
+    }
+
+    private List<String> convertToListOfHeaderAndData(List<? extends BaseEntity> list) {
+        Class cls = list.get(0).getClass();
+        List<Field> fields = Arrays.asList(cls.getDeclaredFields());
+        List<String> result = new ArrayList<>();
+        result.add(convertToHeader(fields));
+        result.addAll(list.stream().map(item -> transform(item, fields)).collect(Collectors.toList()));
+        return result;
+    }
+
+    private String convertToHeader(List<Field> fields) {
+        List<String> headers = new ArrayList<>();
+        for (Field f:fields){
+            headers.add(f.getName());
+        }
+        return String.join(",", headers);
+    }
+
+    @SneakyThrows
+    private String transform(Object o, List<Field> fields) {
+        List<String> person = new ArrayList<>();
+        for (Field f: fields){
+            f.setAccessible(true);
+            String s = String.valueOf(f.get(o));
+            person.add(s);
+        }
+        return String.join(",", person);
     }
 }
